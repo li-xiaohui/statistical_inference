@@ -1,0 +1,113 @@
+# Toothgrowth Analysis
+
+
+## Overview
+
+This is an R Markdown document to analyze the ToothGrowth dataset in the R datasets package.
+In the dataset, the response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+This analysis conducted T test to test if different levels of Vitamin C have different effect on tooth growths.
+
+## Data Exploration
+
+Load necessary libraries
+```{r libraries, echo=TRUE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(datasets)
+```
+
+
+We first load data and explore what the data look like.
+```{r}
+data(ToothGrowth)
+str(ToothGrowth)
+head(ToothGrowth)
+
+summary(ToothGrowth)
+
+table(ToothGrowth$supp, ToothGrowth$dose)
+
+```
+
+Note that supp and does are categorical data with 2 levels and 3 levels repectively.
+So the whole dataset is natually divided into 6 groups, with supp is either OJ or VC
+and dose is 0.5, 1 or 2.
+
+We'd like to plot out the lengths with respect to both supp and dose.
+
+```{r}
+xhist <- qplot(len, geom="histogram", data=ToothGrowth, facets = . ~ dose + supp)
+xhist
+```
+
+For each dosage leve, supp groups (OJ or VC) have different means from the histograms. 
+Next step is to do hypothesis testing to test if they are really different from each other.
+
+## Hypothesis Test
+
+With the assumption that the two supp groups are paird, 
+we will go with this null hypothesis, 
+mean tooth lengths are the same when dose is 0.5mg, 1mg or 2mg for "OJ" group and "VC" group. 
+
+### dose is 0.5mg
+
+```{r}
+
+g1 <-ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==0.5, 1]
+g2 <-ToothGrowth[ToothGrowth$supp=="VC" & ToothGrowth$dose==0.5, 1]
+mean(g1)
+mean(g2)
+
+```
+Noticing that the average of g1 is greater than g2, 
+our alternative hypothesis is that the differnce in means is greater than 0.
+That is, mean tooth growth of group "OJ" is greater than mean tooth growth of group "VC" when dose is 0.5.
+
+Then we conduct T-Test.
+
+```{r}
+
+t.test(g1, g2, paired=T, alternative = "greater")
+
+```
+
+Indeed, the test results reject the null hypothsis.
+The statistically significant p-values indicate that when dosages is 0.5mg, orange juice is more effective at promoting tooth growth than just ascorbic acid.
+
+### dose is 1mg and 2mg
+
+
+Similarly we conduct T-Test for dose being 1mg and dose being 2mg.
+
+```{r}
+
+g1 <-ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==1, 1]
+g2 <-ToothGrowth[ToothGrowth$supp=="VC" & ToothGrowth$dose==1, 1]
+mean(g1)
+mean(g2)
+
+t.test(g1, g2, paired=T, alternative = "greater")
+
+```
+The test results also reject the null hypothsis.
+That is, when dosages is 1mg, orange juice is also more effective at promoting tooth growth than just ascorbic acid.
+
+```{r}
+
+g1 <-ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==2, 1]
+g2 <-ToothGrowth[ToothGrowth$supp=="VC" & ToothGrowth$dose==2, 1]
+mean(g1)
+mean(g2)
+
+t.test(g1, g2, paired=T, alternative = "less")
+
+```
+
+The test does not reject the null hypothesis.
+We cannot conclude that orange juice promotes tooth growth more effectively than just ascorbic acid.
+
+# Conclusion
+
+In this report, we analyzed the ToothGrowth data set.
+We performed t-test on the dataset and found that orange juice promotes tooth growth more effectively than just ascorbic acid when dose is either 0.5mg and 1mg. We cannot reject the null hypothesis that orange juice and ascorbic acid have the same effect on promoting tooth growth when dose is 2mg.
+No conclusion can be drawn from the test
